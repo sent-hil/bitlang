@@ -2,7 +2,13 @@ package lexer
 
 import (
 	"bufio"
+	"errors"
 	"io"
+)
+
+var (
+	ErrBoundsExceeded = errors.New("lexer: size is greater than slice length")
+	ErrNegativeCount  = errors.New("lexer: negative count")
 )
 
 type Lexer struct {
@@ -26,4 +32,15 @@ func NewLexer(reader io.Reader) (*Lexer, error) {
 	}
 
 	return &Lexer{runes: runes}, nil
+}
+
+func (l *Lexer) Peek(size int) ([]rune, error) {
+	if size < 0 {
+		return nil, ErrNegativeCount
+	}
+	if size > len(l.runes) {
+		return nil, ErrBoundsExceeded
+	}
+
+	return l.runes[:size], nil
 }
