@@ -21,24 +21,58 @@ func TestLexer(t *testing.T) {
 
 		Convey("Peak", func() {
 			Convey("It peeks into stored chars when given size is within stored chars size", func() {
-				chars, err := l.Peek(2)
+				chars, err := l.PeekRunes(2)
 				So(err, ShouldBeNil)
 				So(chars, ShouldResemble, []rune{'H', 'e'})
 			})
 
-			Convey("It peeks entire stored chars array", func() {
-				chars, err := l.Peek(5)
+			Convey("It peeks entire stored chars slice", func() {
+				chars, err := l.PeekRunes(5)
 				So(err, ShouldBeNil)
 				So(chars, ShouldResemble, []rune{'H', 'e', 'l', 'l', 'o'})
 			})
 
 			Convey("It returns error when give size is greater than stored chars size", func() {
-				_, err := l.Peek(6)
+				_, err := l.PeekRunes(6)
 				So(err, ShouldEqual, ErrBoundsExceeded)
 			})
 
 			Convey("It returns error when give size is negative", func() {
-				_, err := l.Peek(-1)
+				_, err := l.PeekRunes(-1)
+				So(err, ShouldEqual, ErrNegativeCount)
+			})
+		})
+
+		Convey("ReadRunes", func() {
+			Convey("It returns given size of chars when size is within stored chars size", func() {
+				chars, err := l.ReadRunes(1)
+				So(err, ShouldBeNil)
+				So(chars, ShouldResemble, []rune{'H'})
+			})
+
+			Convey("It returns entire stored chars slice", func() {
+				chars, err := l.ReadRunes(5)
+				So(err, ShouldBeNil)
+				So(chars, ShouldResemble, []rune{'H', 'e', 'l', 'l', 'o'})
+			})
+
+			Convey("It removes returned chars from stored chars slice", func() {
+				_, err := l.ReadRunes(1)
+				So(err, ShouldBeNil)
+				So(l.runes, ShouldResemble, []rune{'e', 'l', 'l', 'o'})
+
+				chars, err := l.ReadRunes(1)
+				So(err, ShouldBeNil)
+				So(chars, ShouldResemble, []rune{'e'})
+			})
+
+			Convey("It returns error when give size is greater than stored chars size", func() {
+				_, err := l.ReadRunes(6)
+				So(err, ShouldEqual, ErrBoundsExceeded)
+			})
+
+			Convey("It returns error when give size is negative", func() {
+				_, err := l.ReadRunes(-1)
 				So(err, ShouldEqual, ErrNegativeCount)
 			})
 		})

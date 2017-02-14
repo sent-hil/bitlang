@@ -34,7 +34,7 @@ func NewLexer(reader io.Reader) (*Lexer, error) {
 	return &Lexer{runes: runes}, nil
 }
 
-func (l *Lexer) Peek(size int) ([]rune, error) {
+func (l *Lexer) PeekRunes(size int) ([]rune, error) {
 	if size < 0 {
 		return nil, ErrNegativeCount
 	}
@@ -43,4 +43,18 @@ func (l *Lexer) Peek(size int) ([]rune, error) {
 	}
 
 	return l.runes[:size], nil
+}
+
+func (l *Lexer) ReadRunes(size int) ([]rune, error) {
+	if size < 0 {
+		return nil, ErrNegativeCount
+	}
+	if size > len(l.runes) {
+		return nil, ErrBoundsExceeded
+	}
+
+	runes := l.runes[0:size]
+	l.runes = l.runes[size:]
+
+	return runes, nil
 }
