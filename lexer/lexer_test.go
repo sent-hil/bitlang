@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"io"
 	"strings"
 	"testing"
 
@@ -40,6 +41,28 @@ func TestLexer(t *testing.T) {
 			Convey("It returns error when give size is negative", func() {
 				_, err := l.PeekRunes(-1)
 				So(err, ShouldEqual, ErrNegativeCount)
+			})
+		})
+
+		Convey("ReadRune", func() {
+			Convey("It returns chars as they're read from chars slice", func() {
+				// required since l.Read modifies l.runes
+				dupRunes := make([]rune, len(l.runes))
+				copy(dupRunes, l.runes)
+
+				for i := 0; i < len(dupRunes); i++ {
+					char, err := l.ReadRune()
+					So(err, ShouldBeNil)
+
+					// cast to string for readable errors
+					So(string(char), ShouldEqual, string(dupRunes[i]))
+				}
+
+				Convey("It returns EOF if no chars are left in chars slice", func() {
+					char, err := l.ReadRune()
+					So(err, ShouldEqual, io.EOF)
+					So(char, ShouldEqual, '\uFFFD') // error rune
+				})
 			})
 		})
 

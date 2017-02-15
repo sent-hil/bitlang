@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"unicode/utf8"
 )
 
 var (
@@ -43,6 +44,17 @@ func (l *Lexer) PeekRunes(size int) ([]rune, error) {
 	}
 
 	return l.runes[:size], nil
+}
+
+func (l *Lexer) ReadRune() (rune, error) {
+	if len(l.runes) == 0 {
+		return utf8.RuneError, io.EOF
+	}
+
+	char := l.runes[0]
+	l.runes = l.runes[1:]
+
+	return char, nil
 }
 
 func (l *Lexer) ReadRunes(size int) ([]rune, error) {
