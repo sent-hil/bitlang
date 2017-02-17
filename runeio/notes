@@ -1,0 +1,34 @@
+func (r *Reader) Discard(n int) (discared int, err error) {
+	return 0, nil
+}
+
+func (r *Reader) Peek(n int) ([]rune, error) {
+	return nil, nil
+}
+
+func (r *Reader) Read(p []byte) (n int, err error) {
+	return 0, nil
+}
+
+func (r *Reader) ReadBytes(delim byte) ([]byte, error) {
+	return nil, nil
+}
+
+func (r *Reader) ReadRune() (ru rune, size int, err error) {
+	return utf8.RuneError, 0, nil
+}
+
+func (r *Reader) ReadSlice(delim byte) (line []byte, err error) {
+	return nil, nil
+}
+
+func (r *Reader) ReadString(delim byte) (string, error) {
+	return "", nil
+}
+
+func (r *Reader) Reset(bufReader *bufio.Reader) {
+}
+
+func (r *Reader) UnreadRune() error {
+	return nil
+}
