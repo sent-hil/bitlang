@@ -24,30 +24,21 @@ func TestRuneIo(t *testing.T) {
 				discarded, err := hw.Discard(1)
 				So(err, ShouldEqual, nil)
 				So(discarded, ShouldEqual, 1)
-
-				b, ok := hw.RuneReadUnreader.(*bytes.Buffer)
-				So(ok, ShouldBeTrue)
-				So(b.String(), ShouldEqual, "ello World")
+				So(hw.String(), ShouldEqual, "ello World")
 			})
 
 			Convey("It discards all runes when given length is same length as reader", func() {
 				discarded, err := hw.Discard(11)
 				So(err, ShouldEqual, nil)
 				So(discarded, ShouldEqual, 11)
-
-				b, ok := hw.RuneReadUnreader.(*bytes.Buffer)
-				So(ok, ShouldBeTrue)
-				So(b.String(), ShouldEqual, "")
+				So(hw.String(), ShouldEqual, "")
 			})
 
 			Convey("It returns io.EOF when given length is greater than length in reader", func() {
 				discarded, err := hw.Discard(12)
 				So(err, ShouldEqual, io.EOF)
 				So(discarded, ShouldEqual, 11)
-
-				b, ok := hw.RuneReadUnreader.(*bytes.Buffer)
-				So(ok, ShouldBeTrue)
-				So(b.String(), ShouldEqual, "")
+				So(hw.String(), ShouldEqual, "")
 
 				discarded, err = em.Discard(1)
 				So(err, ShouldEqual, io.EOF)

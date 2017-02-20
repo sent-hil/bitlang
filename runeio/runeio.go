@@ -4,6 +4,7 @@ package runeio
 type RuneReadUnreader interface {
 	ReadRune() (r rune, size int, err error)
 	UnreadRune() error
+	String() string
 }
 
 type Reader struct {
