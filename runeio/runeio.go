@@ -7,9 +7,21 @@ type RuneReadUnreader interface {
 }
 
 type Reader struct {
-	r RuneReadUnreader
+	RuneReadUnreader
 }
 
 func NewRuneio(r RuneReadUnreader) *Reader {
-	return &Reader{r: r}
+	return &Reader{r}
+}
+
+func (r *Reader) Discard(n uint) (discarded uint, err error) {
+	for i := 0; i < int(n); i++ {
+		_, size, err := r.ReadRune() // size will always be 0 if there's an error
+		if err != nil {
+			return discarded, err
+		}
+		discarded += uint(size)
+	}
+
+	return discarded, nil
 }

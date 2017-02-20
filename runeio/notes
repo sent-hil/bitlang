@@ -1,7 +1,3 @@
-func (r *Reader) Discard(n int) (discared int, err error) {
-	return 0, nil
-}
-
 func (r *Reader) Peek(n int) ([]rune, error) {
 	return nil, nil
 }
