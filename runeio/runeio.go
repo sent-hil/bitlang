@@ -1,18 +1,17 @@
 package runeio
 
-// RuneReadUnreader is the underlying interface Reader will use.
-type RuneReadUnreader interface {
+// RuneReader is the underlying interface Reader will use.
+type RuneReader interface {
 	ReadRune() (r rune, size int, err error)
-	UnreadRune() error
 	String() string
 }
 
 type Reader struct {
-	rr    RuneReadUnreader
+	RuneReader
 	Runes []rune
 }
 
-func NewRuneio(r RuneReadUnreader) *Reader {
+func NewRuneio(r RuneReader) *Reader {
 	return &Reader{r, []rune{}}
 }
 
@@ -41,11 +40,11 @@ func (r *Reader) PeekRunes(n uint) (runes []rune, err error) {
 }
 
 func (r *Reader) String() string {
-	return string(r.Runes) + r.rr.String()
+	return string(r.Runes) + r.RuneReader.String()
 }
 
-func (r *Reader) Reset(bufReader RuneReadUnreader) {
-	r.rr = bufReader
+func (r *Reader) Reset(bufReader RuneReader) {
+	r.RuneReader = bufReader
 }
 
 func (r *Reader) readFromReader(n uint) error {
@@ -58,7 +57,7 @@ func (r *Reader) readFromReader(n uint) error {
 
 	// if not, read the remaining amount of runes
 	for i := 0; i < l; i++ {
-		ru, _, err := r.rr.ReadRune()
+		ru, _, err := r.ReadRune()
 		if err != nil {
 			return err
 		}
