@@ -93,5 +93,16 @@ func TestRuneIo(t *testing.T) {
 				So(hw.String(), ShouldEqual, "Hello World")
 			})
 		})
+
+		Convey("Reset", func() {
+			Convey("It resets reader to given reader", func() {
+				nr := bytes.NewBufferString("New")
+				hw.Reset(nr)
+
+				runes, err := hw.PeekRunes(3)
+				So(err, ShouldBeNil)
+				So(string(runes), ShouldEqual, "New")
+			})
+		})
 	})
 }

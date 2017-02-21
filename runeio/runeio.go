@@ -44,6 +44,10 @@ func (r *Reader) String() string {
 	return string(r.Runes) + r.rr.String()
 }
 
+func (r *Reader) Reset(bufReader RuneReadUnreader) {
+	r.rr = bufReader
+}
+
 func (r *Reader) readFromReader(n uint) error {
 	l := int(n) - len(r.Runes)
 
