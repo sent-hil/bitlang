@@ -24,21 +24,30 @@ func TestRuneIo(t *testing.T) {
 				discarded, err := hw.Discard(1)
 				So(err, ShouldEqual, nil)
 				So(discarded, ShouldEqual, 1)
-				So(hw.String(), ShouldEqual, "ello World")
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, "ello World")
 			})
 
 			Convey("It discards all runes when given length is same length as reader", func() {
 				discarded, err := hw.Discard(11)
 				So(err, ShouldEqual, nil)
 				So(discarded, ShouldEqual, 11)
-				So(hw.String(), ShouldEqual, "")
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, "")
 			})
 
 			Convey("It returns io.EOF when given length is greater than length in reader", func() {
 				discarded, err := hw.Discard(12)
 				So(err, ShouldEqual, io.EOF)
 				So(discarded, ShouldEqual, 11)
-				So(hw.String(), ShouldEqual, "")
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, "")
 
 				discarded, err = em.Discard(1)
 				So(err, ShouldEqual, io.EOF)
@@ -69,7 +78,10 @@ func TestRuneIo(t *testing.T) {
 			Convey("It removes runes from reader", func() {
 				_, err := hw.ReadRunes(11)
 				So(err, ShouldBeNil)
-				So(hw.String(), ShouldEqual, "")
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, "")
 			})
 		})
 
@@ -90,7 +102,10 @@ func TestRuneIo(t *testing.T) {
 			Convey("It does not remove runes from reader", func() {
 				_, err := hw.PeekRunes(1)
 				So(err, ShouldBeNil)
-				So(hw.String(), ShouldEqual, "Hello World")
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, "Hello World")
 			})
 		})
 

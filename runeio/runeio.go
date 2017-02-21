@@ -1,9 +1,14 @@
 package runeio
 
+import (
+	"io"
+	"io/ioutil"
+)
+
 // RuneReader is the underlying interface Reader will use.
 type RuneReader interface {
 	ReadRune() (r rune, size int, err error)
-	String() string
+	io.Reader
 }
 
 type Reader struct {
@@ -39,8 +44,12 @@ func (r *Reader) PeekRunes(n uint) (runes []rune, err error) {
 	return r.Runes[0:n], nil
 }
 
-func (r *Reader) String() string {
-	return string(r.Runes) + r.RuneReader.String()
+func (r *Reader) String() (string, error) {
+	bites, err := ioutil.ReadAll(r.RuneReader)
+	if err != nil {
+		return "", err
+	}
+	return string(r.Runes) + string(bites), nil
 }
 
 func (r *Reader) Reset(bufReader RuneReader) {
