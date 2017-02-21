@@ -8,33 +8,58 @@ type RuneReadUnreader interface {
 }
 
 type Reader struct {
-	RuneReadUnreader
+	rr    RuneReadUnreader
+	Runes []rune
 }
 
 func NewRuneio(r RuneReadUnreader) *Reader {
-	return &Reader{r}
+	return &Reader{r, []rune{}}
 }
 
 func (r *Reader) Discard(n uint) (discarded uint, err error) {
-	for i := 0; i < int(n); i++ {
-		_, size, err := r.ReadRune() // size will always be 0 if there's an error
-		if err != nil {
-			return discarded, err
-		}
-		discarded += uint(size)
-	}
-
-	return discarded, nil
+	runes, err := r.ReadRunes(n)
+	return uint(len(runes)), err
 }
 
 func (r *Reader) ReadRunes(n uint) (runes []rune, err error) {
-	for i := 0; i < int(n); i++ {
-		r, _, err := r.ReadRune()
-		if err != nil {
-			return runes, err
-		}
-		runes = append(runes, r)
+	if err = r.readFromReader(n); err != nil {
+		n = uint(len(r.Runes))
 	}
 
-	return runes, nil
+	runes = r.Runes[0:n]
+	r.Runes = r.Runes[n:]
+
+	return runes, err
+}
+
+func (r *Reader) PeekRunes(n uint) (runes []rune, err error) {
+	if err := r.readFromReader(n); err != nil {
+		return r.Runes, err
+	}
+
+	return r.Runes[0:n], nil
+}
+
+func (r *Reader) String() string {
+	return string(r.Runes) + r.rr.String()
+}
+
+func (r *Reader) readFromReader(n uint) error {
+	l := int(n) - len(r.Runes)
+
+	// check if we've already read enough runes
+	if l <= 0 {
+		return nil
+	}
+
+	// if not, read the remaining amount of runes
+	for i := 0; i < l; i++ {
+		ru, _, err := r.rr.ReadRune()
+		if err != nil {
+			return err
+		}
+		r.Runes = append(r.Runes, ru)
+	}
+
+	return nil
 }
