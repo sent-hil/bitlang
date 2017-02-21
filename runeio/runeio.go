@@ -26,3 +26,15 @@ func (r *Reader) Discard(n uint) (discarded uint, err error) {
 
 	return discarded, nil
 }
+
+func (r *Reader) ReadRunes(n uint) (runes []rune, err error) {
+	for i := 0; i < int(n); i++ {
+		r, _, err := r.ReadRune()
+		if err != nil {
+			return runes, err
+		}
+		runes = append(runes, r)
+	}
+
+	return runes, nil
+}

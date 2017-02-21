@@ -45,5 +45,26 @@ func TestRuneIo(t *testing.T) {
 				So(discarded, ShouldEqual, 0)
 			})
 		})
+
+		Convey("ReadRunes", func() {
+			Convey("It returns given length of runes", func() {
+				runes, err := hw.ReadRunes(1)
+				So(err, ShouldBeNil)
+				So(runes, ShouldHaveSameTypeAs, []rune{})
+				So(string(runes), ShouldResemble, "H")
+			})
+
+			Convey("It returns all runes when given length is same length as reader", func() {
+				runes, err := hw.ReadRunes(11)
+				So(err, ShouldBeNil)
+				So(string(runes), ShouldEqual, "Hello World")
+			})
+
+			Convey("It returns io.EOF when given length is greater than length in reader", func() {
+				runes, err := hw.ReadRunes(12)
+				So(err, ShouldEqual, io.EOF)
+				So(string(runes), ShouldEqual, "Hello World")
+			})
+		})
 	})
 }
