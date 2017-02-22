@@ -67,11 +67,11 @@ func (r *Reader) PeekRunes(n uint) ([]rune, error) {
 	return r.Runes[0:n], nil
 }
 
-// PeekRune peeks a single rune from buffer and return it.
+// PeekSingleRune peeks a single rune from buffer and return it.
 //
 // If the are no runes left in the buffer, it'll return unicode.ReplacementChar
 // and `io.EOF` error.
-func (r *Reader) PeekRune() (rune, error) {
+func (r *Reader) PeekSingleRune() (rune, error) {
 	runes, err := r.PeekRunes(1)
 	if err != nil {
 		return unicode.ReplacementChar, err

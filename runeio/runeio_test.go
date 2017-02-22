@@ -110,15 +110,15 @@ func TestRuneIo(t *testing.T) {
 			})
 		})
 
-		Convey("PeekRune", func() {
+		Convey("PeekSingleRune", func() {
 			Convey("It returns single rune from reader", func() {
-				h, err := hw.PeekRune()
+				h, err := hw.PeekSingleRune()
 				So(err, ShouldBeNil)
 				So(string(h), ShouldEqual, "H")
 			})
 
 			Convey("It does not remove runes from reader", func() {
-				_, err := hw.PeekRune()
+				_, err := hw.PeekSingleRune()
 				So(err, ShouldBeNil)
 
 				str, err := hw.String()
@@ -127,12 +127,12 @@ func TestRuneIo(t *testing.T) {
 			})
 
 			Convey("It returns io.EOF if at end of reader", func() {
-				_, err := em.PeekRune()
+				_, err := em.PeekSingleRune()
 				So(err, ShouldEqual, io.EOF)
 			})
 
 			Convey("It returns last char when index is at end of reader", func() {
-				h, err := om.PeekRune()
+				h, err := om.PeekSingleRune()
 				So(err, ShouldBeNil)
 				So(string(h), ShouldEqual, "H")
 			})
