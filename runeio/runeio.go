@@ -53,6 +53,19 @@ func (r *Reader) ReadRunes(n uint) (runes []rune, err error) {
 	return runes, err
 }
 
+// ReadSingleRune reads a single rune from buffer and return it.
+//
+// If the are no runes left in the buffer, it'll return unicode.ReplacementChar
+// and `io.EOF` error.
+func (r *Reader) ReadSingleRune() (rune, error) {
+	runes, err := r.ReadRunes(1)
+	if err != nil {
+		return unicode.ReplacementChar, err
+	}
+
+	return runes[0], nil
+}
+
 // PeekRunes peeks given n runes from buffers and returns slice of them. It does
 // not however remove them the buffer and the same data will be returned on
 // ReadRunes() operation.
