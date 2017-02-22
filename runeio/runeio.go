@@ -12,7 +12,7 @@ type RuneReader interface {
 	io.Reader
 }
 
-// Reader implements buffered manipulation of runes from underyling RuneReader.
+// Reader implements buffered manipulation of runes using RuneReader.
 //
 // NOTE: while calling Peek* methods won't affect result of ReadRunes(), it'll
 // however read them from RuneReader, but not put them back.
@@ -20,7 +20,7 @@ type Reader struct {
 	RuneReader
 
 	// Runes is temporary buffer used to store runes that are peeked, but not
-	// read.
+	// yet read.
 	Runes []rune
 }
 
@@ -32,7 +32,7 @@ func NewReader(r RuneReader) *Reader {
 // Discard skips the given n runes, returning number of runes discarded.
 //
 // If given n is greater than amount of runes in the buffer, it'll discard all
-// the runes and return io.EOF.
+// the runes and return `io.EOF`.
 func (r *Reader) Discard(n uint) (uint, error) {
 	runes, err := r.ReadRunes(n)
 	return uint(len(runes)), err
@@ -40,8 +40,8 @@ func (r *Reader) Discard(n uint) (uint, error) {
 
 // ReadRunes reads given n runes from buffers and returns slice of them.
 //
-// If given n is greater than amount of runes in the buffer, it'll read and
-// return all the runes and io.EOF as error.
+// If given n is greater than amount of runes in the buffer, it'll return all
+// the runes and `io.EOF` as error.
 func (r *Reader) ReadRunes(n uint) (runes []rune, err error) {
 	if err = r.readFromReader(n); err != nil {
 		n = uint(len(r.Runes))
@@ -57,8 +57,8 @@ func (r *Reader) ReadRunes(n uint) (runes []rune, err error) {
 // not however remove them the buffer and the same data will be returned on
 // ReadRunes() operation.
 //
-// If given n is greater than amount of runes in the buffer, it'll read and
-// return all the runes and io.EOF as error.
+// If given n is greater than amount of runes in the buffer, it'll peek all
+// the runes and `io.EOF` as error.
 func (r *Reader) PeekRunes(n uint) ([]rune, error) {
 	if err := r.readFromReader(n); err != nil {
 		return r.Runes, err
@@ -70,7 +70,7 @@ func (r *Reader) PeekRunes(n uint) ([]rune, error) {
 // PeekRune peeks a single rune from buffer and return it.
 //
 // If the are no runes left in the buffer, it'll return unicode.ReplacementChar
-// and io.EOF error.
+// and `io.EOF` error.
 func (r *Reader) PeekRune() (rune, error) {
 	runes, err := r.PeekRunes(1)
 	if err != nil {
@@ -80,8 +80,11 @@ func (r *Reader) PeekRune() (rune, error) {
 	return runes[0], nil
 }
 
-// String returns ALL the unread portion of local and underlying reader as a
-// string.
+// String returns ALL the unread runes in local buffer and underlying reader as
+// a string.
+//
+// NOTE, it uses ioutil.ReadAll() to read runes from reader which may have
+// performance issues depending on size of reader.
 func (r *Reader) String() (string, error) {
 	bites, err := ioutil.ReadAll(r.RuneReader)
 	if err != nil {
@@ -90,13 +93,15 @@ func (r *Reader) String() (string, error) {
 	return string(r.Runes) + string(bites), nil
 }
 
-// Reset replaces the underlying reader with the given one.
+// Reset replaces the underlying reader with the given reader.
 func (r *Reader) Reset(bufReader RuneReader) {
 	r.RuneReader = bufReader
 }
 
-// readFromReader reads given x number of runes from underlying reader to make
-// sure local buffer has n runes.
+// readFromReader gets given x number of runes from underlying reader and stores
+// it to make sure local buffer has n runes.
+//
+// If the are no runes left in the reader, it'll return `io.EOF` error.
 func (r *Reader) readFromReader(n uint) error {
 	l := int(n) - len(r.Runes)
 
