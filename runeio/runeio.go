@@ -66,6 +66,19 @@ func (r *Reader) ReadSingleRune() (rune, error) {
 	return runes[0], nil
 }
 
+// ReadTill returns all the runes that matches the given matcher function.
+func (r *Reader) ReadTill(matcherFn func(rune) bool) (runes []rune) {
+	for {
+		if r, _ := r.ReadSingleRune(); matcherFn(r) {
+			runes = append(runes, r)
+		} else {
+			break
+		}
+	}
+
+	return runes
+}
+
 // PeekRunes peeks given n runes from buffers and returns slice of them. It does
 // not however remove them the buffer and the same data will be returned on
 // ReadRunes() operation.

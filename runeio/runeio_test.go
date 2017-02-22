@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"testing"
+	"unicode"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -104,6 +105,28 @@ func TestRuneIo(t *testing.T) {
 				So(string(h), ShouldEqual, "H")
 			})
 		})
+
+		Convey("ReadTill", func() {
+			Convey("It returns no runes if 1st rune does not match", func() {
+				runes := hw.ReadTill(func(r rune) bool { return r == 'o' })
+				So(len(runes), ShouldEqual, 0)
+			})
+
+			Convey("It returns single rune if only 1st rune matches", func() {
+				runes := hw.ReadTill(func(r rune) bool { return r == 'H' })
+				So(len(runes), ShouldEqual, 1)
+				So(string(runes[0]), ShouldEqual, "H")
+			})
+
+			Convey("It returns all runes till io.EOF if all runes matches", func() {
+				runes := hw.ReadTill(func(r rune) bool {
+					return unicode.IsLetter(r) || unicode.IsSpace(r)
+				})
+				So(len(runes), ShouldEqual, 11)
+				So(string(runes), ShouldEqual, "Hello World")
+			})
+		})
+
 		Convey("PeekRunes", func() {
 			Convey("It returns given length of runes", func() {
 				runes, err := hw.PeekRunes(1)
