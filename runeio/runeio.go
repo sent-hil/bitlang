@@ -20,7 +20,7 @@ func NewRuneio(r RuneReader) *Reader {
 	return &Reader{r, []rune{}}
 }
 
-func (r *Reader) Discard(n uint) (discarded uint, err error) {
+func (r *Reader) Discard(n uint) (uint, error) {
 	runes, err := r.ReadRunes(n)
 	return uint(len(runes)), err
 }
@@ -36,7 +36,7 @@ func (r *Reader) ReadRunes(n uint) (runes []rune, err error) {
 	return runes, err
 }
 
-func (r *Reader) PeekRunes(n uint) (runes []rune, err error) {
+func (r *Reader) PeekRunes(n uint) ([]rune, error) {
 	if err := r.readFromReader(n); err != nil {
 		return r.Runes, err
 	}
