@@ -44,6 +44,15 @@ func (r *Reader) PeekRunes(n uint) (runes []rune, err error) {
 	return r.Runes[0:n], nil
 }
 
+func (r *Reader) PeekRune() (rune, error) {
+	runes, err := r.PeekRunes(1)
+	if err != nil {
+		return '\uFFFD', err
+	}
+
+	return runes[0], nil
+}
+
 func (r *Reader) String() (string, error) {
 	bites, err := ioutil.ReadAll(r.RuneReader)
 	if err != nil {

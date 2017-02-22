@@ -11,6 +11,7 @@ import (
 func TestRuneIo(t *testing.T) {
 	Convey("RuneIo", t, func() {
 		hw := NewRuneio(bytes.NewBufferString("Hello World"))
+		om := NewRuneio(bytes.NewBufferString("H"))
 		em := NewRuneio(bytes.NewBufferString(""))
 
 		Convey("NewRuneio", func() {
@@ -106,6 +107,34 @@ func TestRuneIo(t *testing.T) {
 				str, err := hw.String()
 				So(err, ShouldBeNil)
 				So(str, ShouldEqual, "Hello World")
+			})
+		})
+
+		Convey("PeekRune", func() {
+			Convey("It returns single rune from reader", func() {
+				h, err := hw.PeekRune()
+				So(err, ShouldBeNil)
+				So(string(h), ShouldEqual, "H")
+			})
+
+			Convey("It does not remove runes from reader", func() {
+				_, err := hw.PeekRune()
+				So(err, ShouldBeNil)
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, "Hello World")
+			})
+
+			Convey("It returns io.EOF if at end of reader", func() {
+				_, err := em.PeekRune()
+				So(err, ShouldEqual, io.EOF)
+			})
+
+			Convey("It returns last char when index is at end of reader", func() {
+				h, err := om.PeekRune()
+				So(err, ShouldBeNil)
+				So(string(h), ShouldEqual, "H")
 			})
 		})
 
