@@ -10,11 +10,11 @@ import (
 
 func TestRuneIo(t *testing.T) {
 	Convey("RuneIo", t, func() {
-		hw := NewRuneio(bytes.NewBufferString("Hello World"))
-		om := NewRuneio(bytes.NewBufferString("H"))
-		em := NewRuneio(bytes.NewBufferString(""))
+		hw := NewReader(bytes.NewBufferString("Hello World"))
+		om := NewReader(bytes.NewBufferString("H"))
+		em := NewReader(bytes.NewBufferString(""))
 
-		Convey("NewRuneio", func() {
+		Convey("NewReader", func() {
 			Convey("It returns initialized Reader", func() {
 				So(hw, ShouldHaveSameTypeAs, &Reader{})
 			})
