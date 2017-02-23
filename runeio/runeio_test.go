@@ -125,6 +125,17 @@ func TestRuneIo(t *testing.T) {
 				So(len(runes), ShouldEqual, 11)
 				So(string(runes), ShouldEqual, "Hello World")
 			})
+
+			Convey("It unreads rune if it doesn't match", func() {
+				runes := hw.ReadTill(func(r rune) bool {
+					return unicode.IsLetter(r)
+				})
+				So(len(runes), ShouldEqual, 5)
+
+				str, err := hw.String()
+				So(err, ShouldBeNil)
+				So(str, ShouldEqual, " World")
+			})
 		})
 
 		Convey("PeekRunes", func() {

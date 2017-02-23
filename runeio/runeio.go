@@ -69,8 +69,9 @@ func (r *Reader) ReadSingleRune() (rune, error) {
 // ReadTill returns all the runes that matches the given matcher function.
 func (r *Reader) ReadTill(matcherFn func(rune) bool) (runes []rune) {
 	for {
-		if r, _ := r.ReadSingleRune(); matcherFn(r) {
-			runes = append(runes, r)
+		if ru, _ := r.PeekSingleRune(); matcherFn(ru) {
+			ru, _ = r.ReadSingleRune()
+			runes = append(runes, ru)
 		} else {
 			break
 		}
