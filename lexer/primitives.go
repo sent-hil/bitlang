@@ -1,7 +1,10 @@
 package lexer
 
+import "unicode"
+
 type Peekable interface {
 	PeekRunes(uint) ([]rune, error)
+	PeekSingleRune() (rune, error)
 }
 
 type Readable interface {
@@ -24,5 +27,28 @@ func (c *CommentLexer) Match(p Peekable) bool {
 }
 
 func (c *CommentLexer) Lex(r Readable) (commentRunes []rune) {
-	return r.ReadTill(func(r rune) bool { return r != '\n' })
+	return r.ReadTill(
+		func(char rune) bool { return char != '\n' },
+	)
+}
+
+type IntegerLexer struct{}
+
+func NewIntegerLexer() *IntegerLexer {
+	return &IntegerLexer{}
+}
+
+func (i *IntegerLexer) Match(p Peekable) bool {
+	char, err := p.PeekSingleRune()
+	if err != nil {
+		return false
+	}
+
+	return unicode.IsNumber(char)
+}
+
+func (i *IntegerLexer) Lex(r Readable) []rune {
+	return r.ReadTill(
+		func(char rune) bool { return unicode.IsNumber(char) },
+	)
 }

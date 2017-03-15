@@ -42,4 +42,32 @@ func TestPrimitives(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("IntegerLexer", t, func() {
+		l := NewIntegerLexer()
+
+		Convey("Match", func() {
+			Convey("It matches if char is a number", func() {
+				So(l.Match(newRuneReader("1")), ShouldEqual, true)
+			})
+
+			Convey("It does not match on empty string", func() {
+				So(l.Match(newRuneReader("")), ShouldEqual, false)
+			})
+
+			Convey("It does not match on strings", func() {
+				So(l.Match(newRuneReader("Hello")), ShouldEqual, false)
+			})
+		})
+
+		Convey("Lex", func() {
+			Convey("It returns till end of integer", func() {
+				So(string(l.Lex(newRuneReader("1234"))), ShouldEqual, "1234")
+			})
+
+			Convey("It should not lex anything after integer", func() {
+				So(string(l.Lex(newRuneReader("1234 Hello"))), ShouldEqual, "1234")
+			})
+		})
+	})
 }
