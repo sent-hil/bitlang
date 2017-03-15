@@ -32,13 +32,13 @@ func (c *CommentLexer) Lex(r Readable) []rune {
 	)
 }
 
-type IntegerLexer struct{}
+type NumberLexer struct{}
 
-func NewIntegerLexer() *IntegerLexer {
-	return &IntegerLexer{}
+func NewIntegerLexer() *NumberLexer {
+	return &NumberLexer{}
 }
 
-func (i *IntegerLexer) Match(p Peekable) bool {
+func (i *NumberLexer) Match(p Peekable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
 		return false
@@ -47,8 +47,24 @@ func (i *IntegerLexer) Match(p Peekable) bool {
 	return unicode.IsNumber(char)
 }
 
-func (i *IntegerLexer) Lex(r Readable) []rune {
+func (i *NumberLexer) Lex(r Readable) []rune {
+	hasDot := false
+
 	return r.ReadTill(
-		func(char rune) bool { return unicode.IsNumber(char) },
+		func(char rune) bool {
+			if unicode.IsNumber(char) {
+				return true
+			}
+
+			if string(char) == "." {
+				if hasDot {
+					return false // already has a dot, so this is an error
+				}
+				hasDot = true
+				return true
+			}
+
+			return false
+		},
 	)
 }

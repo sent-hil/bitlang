@@ -29,21 +29,26 @@ func TestPrimitives(t *testing.T) {
 		})
 
 		Convey("Lex", func() {
-			cLexer := NewCommentLexer()
+			l := NewCommentLexer()
 
 			Convey("It returns string till end of line", func() {
-				commentRunes := cLexer.Lex(newRuneReader("// Hello World"))
+				commentRunes := l.Lex(newRuneReader("// Hello World"))
 				So(string(commentRunes), ShouldEqual, "// Hello World")
 			})
 
+			Convey("It returns comments inside comments", func() {
+				commentRunes := l.Lex(newRuneReader("// Hello // World"))
+				So(string(commentRunes), ShouldEqual, "// Hello // World")
+			})
+
 			Convey("It should not lex anything after new line", func() {
-				commentRunes := cLexer.Lex(newRuneReader("// Hello World\n//"))
+				commentRunes := l.Lex(newRuneReader("// Hello World\n//"))
 				So(string(commentRunes), ShouldEqual, "// Hello World")
 			})
 		})
 	})
 
-	Convey("IntegerLexer", t, func() {
+	Convey("NumberLexer", t, func() {
 		l := NewIntegerLexer()
 
 		Convey("Match", func() {
@@ -65,7 +70,15 @@ func TestPrimitives(t *testing.T) {
 				So(string(l.Lex(newRuneReader("1234"))), ShouldEqual, "1234")
 			})
 
-			Convey("It should not lex anything after integer", func() {
+			Convey("It returns till end of float", func() {
+				So(string(l.Lex(newRuneReader("1234.5"))), ShouldEqual, "1234.5")
+			})
+
+			Convey("It returns till end of float even with multiple dots", func() {
+				So(string(l.Lex(newRuneReader("1234.5.6"))), ShouldEqual, "1234.5")
+			})
+
+			Convey("It should not lex anything after number", func() {
 				So(string(l.Lex(newRuneReader("1234 Hello"))), ShouldEqual, "1234")
 			})
 		})
