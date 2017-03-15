@@ -18,15 +18,15 @@ func NewCommentLexer() *CommentLexer {
 }
 
 func (c *CommentLexer) Match(p Peekable) bool {
-	runes, err := p.PeekRunes(2)
+	chars, err := p.PeekRunes(2)
 	if err != nil {
 		return false
 	}
 
-	return string(runes) == "//"
+	return string(chars) == "//"
 }
 
-func (c *CommentLexer) Lex(r Readable) (commentRunes []rune) {
+func (c *CommentLexer) Lex(r Readable) []rune {
 	return r.ReadTill(
 		func(char rune) bool { return char != '\n' },
 	)
