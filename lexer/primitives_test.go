@@ -32,18 +32,18 @@ func TestPrimitives(t *testing.T) {
 			l := NewCommentLexer()
 
 			Convey("It returns string till end of line", func() {
-				commentRunes := l.Lex(newRuneReader("// Hello World"))
-				So(string(commentRunes), ShouldEqual, "// Hello World")
+				commentRunes := l.Lex(newRuneReader("//Hello World"))
+				So(string(commentRunes), ShouldEqual, "Hello World")
 			})
 
 			Convey("It returns comments inside comments", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello // World"))
-				So(string(commentRunes), ShouldEqual, "// Hello // World")
+				So(string(commentRunes), ShouldEqual, " Hello // World")
 			})
 
 			Convey("It should not lex anything after new line", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello World\n//"))
-				So(string(commentRunes), ShouldEqual, "// Hello World")
+				So(string(commentRunes), ShouldEqual, " Hello World")
 			})
 		})
 	})

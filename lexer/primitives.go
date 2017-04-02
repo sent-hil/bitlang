@@ -8,6 +8,7 @@ type Peekable interface {
 }
 
 type Readable interface {
+	ReadRunes(uint) ([]rune, error)
 	ReadTill(func(rune) bool) []rune
 }
 
@@ -27,6 +28,8 @@ func (c *CommentLexer) Match(p Peekable) bool {
 }
 
 func (c *CommentLexer) Lex(r Readable) []rune {
+	r.ReadRunes(2) // throwaway '//' at beginning of line
+
 	return r.ReadTill(
 		func(char rune) bool { return char != '\n' },
 	)
