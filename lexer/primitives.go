@@ -56,12 +56,13 @@ func (i *NumberLexer) Lex(r Readable) []rune {
 				return true
 			}
 
-			if string(char) == "." {
+			if char == '.' {
 				if hasDot {
 					return false // already has a dot, so this is an error
+				} else {
+					hasDot = true
+					return true
 				}
-				hasDot = true
-				return true
 			}
 
 			return false
