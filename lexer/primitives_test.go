@@ -12,7 +12,7 @@ func newRuneReader(s string) *runeio.Reader {
 	return runeio.NewReader(bytes.NewBufferString(s))
 }
 
-func TestPrimitives(t *testing.T) {
+func TestCommentLexer(t *testing.T) {
 	Convey("CommentLexer", t, func() {
 		Convey("Match", func() {
 			Convey("It does not match if only '/' is present", func() {
@@ -26,12 +26,16 @@ func TestPrimitives(t *testing.T) {
 			Convey("It matches if '//' are in beginning of line", func() {
 				So(NewCommentLexer().Match(newRuneReader("//")), ShouldEqual, true)
 			})
+
+			Convey("It matches if '//' is in beginning of line followed any char", func() {
+				So(NewCommentLexer().Match(newRuneReader("//H")), ShouldEqual, true)
+			})
 		})
 
 		Convey("Lex", func() {
 			l := NewCommentLexer()
 
-			Convey("It returns string till end of line", func() {
+			Convey("It returns comments from '//' till end of line", func() {
 				commentRunes := l.Lex(newRuneReader("//Hello World"))
 				So(string(commentRunes), ShouldEqual, "Hello World")
 			})
@@ -41,13 +45,15 @@ func TestPrimitives(t *testing.T) {
 				So(string(commentRunes), ShouldEqual, " Hello // World")
 			})
 
-			Convey("It should not lex anything after new line", func() {
+			Convey("It does not lex anything after new line", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello World\n//"))
 				So(string(commentRunes), ShouldEqual, " Hello World")
 			})
 		})
 	})
+}
 
+func TestNumberLexer(t *testing.T) {
 	Convey("NumberLexer", t, func() {
 		l := NewIntegerLexer()
 
@@ -60,7 +66,7 @@ func TestPrimitives(t *testing.T) {
 				So(l.Match(newRuneReader("")), ShouldEqual, false)
 			})
 
-			Convey("It does not match on strings", func() {
+			Convey("It does not match any chars", func() {
 				So(l.Match(newRuneReader("Hello")), ShouldEqual, false)
 			})
 		})
@@ -74,11 +80,11 @@ func TestPrimitives(t *testing.T) {
 				So(string(l.Lex(newRuneReader("1234.5"))), ShouldEqual, "1234.5")
 			})
 
-			Convey("It returns till end of float even with multiple dots", func() {
+			Convey("IT does not lex anything after 1st dot", func() {
 				So(string(l.Lex(newRuneReader("1234.5.6"))), ShouldEqual, "1234.5")
 			})
 
-			Convey("It should not lex anything after number", func() {
+			Convey("It does not lex anything after number", func() {
 				So(string(l.Lex(newRuneReader("1234 Hello"))), ShouldEqual, "1234")
 			})
 		})
