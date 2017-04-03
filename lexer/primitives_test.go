@@ -149,12 +149,16 @@ func TestIdentifierLexer(t *testing.T) {
 				So(string(l.Lex(newRuneReader("hello world"))), ShouldEqual, "hello")
 			})
 
+			Convey("It returns chars till new tab", func() {
+				So(string(l.Lex(newRuneReader("hello\tworld"))), ShouldEqual, "hello")
+			})
+
 			Convey("It returns chars till end of line", func() {
 				So(string(l.Lex(newRuneReader("hello\nworld"))), ShouldEqual, "hello")
 			})
 
-			Convey("It returns chars till new tab", func() {
-				So(string(l.Lex(newRuneReader("hello\tworld"))), ShouldEqual, "hello")
+			Convey("It returns chars till carriage return", func() {
+				So(string(l.Lex(newRuneReader("hello\rworld"))), ShouldEqual, "hello")
 			})
 		})
 	})

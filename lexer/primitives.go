@@ -128,15 +128,17 @@ func (i *IdentifierLexer) Match(p Peekable) bool {
 	return unicode.IsLetter(char)
 }
 
-// Lex lexes from start till space, tab or end of line.
+// Lex lexes from start till space, tab, end of line or carriage return.
 func (i *IdentifierLexer) Lex(r Readable) []rune {
 	return r.ReadTill(
 		func(char rune) bool {
 			if unicode.IsSpace(char) {
 				return false
+			} else if char == '\t' {
+				return false
 			} else if char == '\n' {
 				return false
-			} else if char == '\t' {
+			} else if char == '\r' {
 				return false
 			}
 
