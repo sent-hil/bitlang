@@ -132,17 +132,7 @@ func (i *IdentifierLexer) Match(p Peekable) bool {
 func (i *IdentifierLexer) Lex(r Readable) []rune {
 	return r.ReadTill(
 		func(char rune) bool {
-			if unicode.IsSpace(char) {
-				return false
-			} else if char == '\t' {
-				return false
-			} else if char == '\n' {
-				return false
-			} else if char == '\r' {
-				return false
-			}
-
-			return true
+			return unicode.IsLetter(char) || unicode.IsNumber(char)
 		},
 	)
 }
