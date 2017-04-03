@@ -72,3 +72,30 @@ func (i *NumberLexer) Lex(r Readable) []rune {
 		},
 	)
 }
+
+type StringLexer struct{}
+
+func NewStringLexer() *StringLexer {
+	return &StringLexer{}
+}
+
+func (s *StringLexer) Match(p Peekable) bool {
+	char, err := p.PeekSingleRune()
+	if err != nil {
+		return false
+	}
+
+	return char == '"'
+}
+
+func (s *StringLexer) Lex(r Readable) []rune {
+	r.ReadRunes(1) // throwaway '"' at beginning of line
+
+	chars := r.ReadTill(
+		func(char rune) bool { return char != '"' },
+	)
+
+	r.ReadRunes(1) // throwaway '"' at end of line
+
+	return chars
+}

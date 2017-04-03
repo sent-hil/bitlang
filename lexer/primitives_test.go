@@ -90,3 +90,42 @@ func TestNumberLexer(t *testing.T) {
 		})
 	})
 }
+
+func TestStringLexer(t *testing.T) {
+	Convey("StringLexer", t, func() {
+		l := NewStringLexer()
+
+		Convey("Match", func() {
+			Convey("It matches if 1st char is double quotes", func() {
+				So(l.Match(newRuneReader(`"`)), ShouldEqual, true)
+			})
+
+			Convey("It matches chars wrapped in double quotes", func() {
+				So(l.Match(newRuneReader(`"Hello"`)), ShouldEqual, true)
+			})
+
+			Convey("It does not match single quote", func() {
+				So(l.Match(newRuneReader(`'`)), ShouldEqual, false)
+			})
+
+			Convey("It does not match on empty string", func() {
+				So(l.Match(newRuneReader("")), ShouldEqual, false)
+			})
+		})
+
+		Convey("Lex", func() {
+			Convey("It returns chars inside double quotes", func() {
+				So(string(l.Lex(newRuneReader(`"Hello"`))), ShouldEqual, "Hello")
+			})
+
+			Convey("It discards quotes at end of the string", func() {
+				r := newRuneReader(`"Hello"`)
+				So(string(l.Lex(r)), ShouldEqual, "Hello")
+
+				remaining, err := r.String()
+				So(err, ShouldBeNil)
+				So(remaining, ShouldEqual, "")
+			})
+		})
+	})
+}
