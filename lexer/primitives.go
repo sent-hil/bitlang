@@ -111,3 +111,36 @@ func (s *StringLexer) Lex(r Readable) []rune {
 
 	return chars
 }
+
+type IdentifierLexer struct{}
+
+func NewIdentifierLexer() *IdentifierLexer {
+	return &IdentifierLexer{}
+}
+
+// Match matches if first character is a number.
+func (i *IdentifierLexer) Match(p Peekable) bool {
+	char, err := p.PeekSingleRune()
+	if err != nil {
+		return false
+	}
+
+	return unicode.IsLetter(char)
+}
+
+// Lex lexes from start till space, tab or end of line.
+func (i *IdentifierLexer) Lex(r Readable) []rune {
+	return r.ReadTill(
+		func(char rune) bool {
+			if unicode.IsSpace(char) {
+				return false
+			} else if char == '\n' {
+				return false
+			} else if char == '\t' {
+				return false
+			}
+
+			return true
+		},
+	)
+}

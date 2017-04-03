@@ -129,3 +129,33 @@ func TestStringLexer(t *testing.T) {
 		})
 	})
 }
+
+func TestIdentifierLexer(t *testing.T) {
+	Convey("IdentifierLexer", t, func() {
+		l := NewIdentifierLexer()
+
+		Convey("Match", func() {
+			Convey("It matches if 1st char is double quotes", func() {
+				So(l.Match(newRuneReader("hello")), ShouldEqual, true)
+			})
+		})
+
+		Convey("Lex", func() {
+			Convey("It returns chars till end of string", func() {
+				So(string(l.Lex(newRuneReader("hello"))), ShouldEqual, "hello")
+			})
+
+			Convey("It returns chars till space", func() {
+				So(string(l.Lex(newRuneReader("hello world"))), ShouldEqual, "hello")
+			})
+
+			Convey("It returns chars till end of line", func() {
+				So(string(l.Lex(newRuneReader("hello\nworld"))), ShouldEqual, "hello")
+			})
+
+			Convey("It returns chars till new tab", func() {
+				So(string(l.Lex(newRuneReader("hello\tworld"))), ShouldEqual, "hello")
+			})
+		})
+	})
+}
