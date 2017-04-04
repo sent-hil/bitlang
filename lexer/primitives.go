@@ -1,6 +1,9 @@
 package lexer
 
-import "unicode"
+import (
+	"io"
+	"unicode"
+)
 
 type Peekable interface {
 	PeekRunes(uint) ([]rune, error)
@@ -136,4 +139,21 @@ func (i *IdentifierLexer) Lex(r Readable) []rune {
 			return unicode.IsLetter(char) || unicode.IsNumber(char)
 		},
 	)
+}
+
+type EOFLexer struct{}
+
+func NewEOFLexer() *EOFLexer {
+	return &EOFLexer{}
+}
+
+// Match matches if at end of input.
+func (e *EOFLexer) Match(p Peekable) bool {
+	_, err := p.PeekSingleRune()
+	return err == io.EOF
+}
+
+// Lex returns nil to indicate there's nothing more to lex.
+func (e *EOFLexer) Lex(r Readable) []rune {
+	return nil
 }

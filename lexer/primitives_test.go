@@ -171,3 +171,21 @@ func TestIdentifierLexer(t *testing.T) {
 		})
 	})
 }
+
+func TestEOFLexer(t *testing.T) {
+	Convey("EOFLexer", t, func() {
+		l := NewEOFLexer()
+
+		Convey("Match", func() {
+			Convey("It matches if at end of file", func() {
+				So(l.Match(newRuneReader("")), ShouldEqual, true)
+			})
+		})
+
+		Convey("Lex", func() {
+			Convey("It returns chars till end of string", func() {
+				So(len(l.Lex(newRuneReader(""))), ShouldEqual, 0)
+			})
+		})
+	})
+}
