@@ -14,27 +14,27 @@ func newRuneReader(s string) *runeio.Reader {
 
 func TestCommentLexer(t *testing.T) {
 	Convey("CommentLexer", t, func() {
+		l := NewCommentLexer()
+
 		Convey("Match", func() {
 			Convey("It does not match if only '/' is present", func() {
-				So(NewCommentLexer().Match(newRuneReader("/")), ShouldEqual, false)
+				So(l.Match(newRuneReader("/")), ShouldEqual, false)
 			})
 
 			Convey("It does not match on empty string", func() {
-				So(NewCommentLexer().Match(newRuneReader("")), ShouldEqual, false)
+				So(l.Match(newRuneReader("")), ShouldEqual, false)
 			})
 
 			Convey("It matches if '//' are in beginning of line", func() {
-				So(NewCommentLexer().Match(newRuneReader("//")), ShouldEqual, true)
+				So(l.Match(newRuneReader("//")), ShouldEqual, true)
 			})
 
 			Convey("It matches if '//' is in beginning of line followed any char", func() {
-				So(NewCommentLexer().Match(newRuneReader("//H")), ShouldEqual, true)
+				So(l.Match(newRuneReader("//H")), ShouldEqual, true)
 			})
 		})
 
 		Convey("Lex", func() {
-			l := NewCommentLexer()
-
 			Convey("It returns comments from '//' till end of line", func() {
 				commentRunes := l.Lex(newRuneReader("//Hello World"))
 				So(string(commentRunes), ShouldEqual, "Hello World")
