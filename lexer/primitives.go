@@ -8,6 +8,7 @@ type Peekable interface {
 }
 
 type Readable interface {
+	Peekable
 	ReadRunes(uint) ([]rune, error)
 	ReadTill(func(rune) bool) []rune
 }
