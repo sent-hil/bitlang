@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/sent-hil/bitlang/runeio"
@@ -185,6 +186,29 @@ func TestEOFLexer(t *testing.T) {
 		Convey("Lex", func() {
 			Convey("It returns chars till end of string", func() {
 				So(len(l.Lex(newRuneReader(""))), ShouldEqual, 0)
+			})
+		})
+	})
+}
+
+func TestWhiteSpaceLexer(t *testing.T) {
+	Convey("WhiteSpaceLexer", t, func() {
+		l := NewWhiteSpaceLexer()
+
+		Convey("Match", func() {
+			Convey("It matches if at end of file", func() {
+				for _, char := range WhiteSpaceChars {
+					So(l.Match(newRuneReader(char)), ShouldEqual, true)
+				}
+			})
+		})
+
+		Convey("Lex", func() {
+			Convey("It returns chars till end of string", func() {
+				for _, char := range WhiteSpaceChars {
+					charWithExtra := fmt.Sprintf("%shello", char)
+					So(string(l.Lex(newRuneReader(charWithExtra))), ShouldEqual, char)
+				}
 			})
 		})
 	})

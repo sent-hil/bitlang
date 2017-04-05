@@ -5,6 +5,8 @@ import (
 	"unicode"
 )
 
+var WhiteSpaceChars = []string{"\t", "\n", "\r", " "}
+
 type CommentLexer struct{}
 
 func NewCommentLexer() *CommentLexer {
@@ -145,4 +147,34 @@ func (e *EOFLexer) Match(p Peekable) bool {
 // Lex returns nil to indicate there's nothing more to lex.
 func (e *EOFLexer) Lex(r Readable) []rune {
 	return nil
+}
+
+type WhiteSpaceLexer struct{}
+
+func NewWhiteSpaceLexer() *WhiteSpaceLexer {
+	return &WhiteSpaceLexer{}
+}
+
+func (w *WhiteSpaceLexer) Match(p Peekable) bool {
+	char, err := p.PeekSingleRune()
+	if err != nil {
+		return false
+	}
+
+	for _, whiteSpaceChar := range WhiteSpaceChars {
+		if whiteSpaceChar == string(char) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (w *WhiteSpaceLexer) Lex(r Readable) []rune {
+	chars, err := r.ReadRunes(1)
+	if err != nil {
+		return nil
+	}
+
+	return chars
 }
