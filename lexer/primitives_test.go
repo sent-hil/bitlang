@@ -46,9 +46,14 @@ func TestCommentLexer(t *testing.T) {
 				So(string(commentRunes), ShouldEqual, " Hello // World")
 			})
 
+			Convey("It returns multi line comments with newlines", func() {
+				commentRunes := l.Lex(newRuneReader("// Hello\n// World\n"))
+				So(string(commentRunes), ShouldEqual, " Hello\n World\n")
+			})
+
 			Convey("It does not lex anything after new line", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello World\n//"))
-				So(string(commentRunes), ShouldEqual, " Hello World")
+				So(string(commentRunes), ShouldEqual, " Hello World\n")
 			})
 		})
 	})

@@ -23,16 +23,25 @@ func (c *CommentLexer) Match(p Peekable) bool {
 	return string(chars) == "//"
 }
 
-// Lex lexes from after '//' to end of line. It does NOT implement multi line
-// comments.
-//
-// TODO: implement multi line comments, ie // line1\n // line2.
-func (c *CommentLexer) Lex(r Readable) []rune {
-	r.ReadRunes(2) // throwaway '//' at beginning of line
+// Lex lexes from after '//' to end of line. It supports multi line comments.
+func (c *CommentLexer) Lex(r Readable) (results []rune) {
+	for c.Match(r) {
+		r.ReadRunes(2) // throwaway '//' at beginning of line
 
-	return r.ReadTill(
-		func(char rune) bool { return char != '\n' },
-	)
+		results = append(results, r.ReadTill(
+			func(char rune) bool { return char != '\n' },
+		)...)
+
+		// read '\n' and add to results
+		chars, err := r.ReadRunes(1)
+		if err != nil {
+			return results
+		}
+
+		results = append(results, chars[0])
+	}
+
+	return results
 }
 
 type NumberLexer struct{}
