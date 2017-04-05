@@ -119,6 +119,14 @@ func TestStringLexer(t *testing.T) {
 				So(string(l.Lex(newRuneReader(`"Hello"`))), ShouldEqual, "Hello")
 			})
 
+			Convey("It returns escaped double quote inside double quotes", func() {
+				So(string(l.Lex(newRuneReader(`"He\"llo"`))), ShouldEqual, `He\"llo`)
+			})
+
+			Convey("It returns escaped slashes and double quotes inside double quotes", func() {
+				So(string(l.Lex(newRuneReader(`"He\\\"llo"`))), ShouldEqual, `He\\\"llo`)
+			})
+
 			Convey("It discards quotes at end of the string", func() {
 				r := newRuneReader(`"Hello"`)
 				So(string(l.Lex(r)), ShouldEqual, "Hello")

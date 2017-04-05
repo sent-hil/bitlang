@@ -92,19 +92,28 @@ func (s *StringLexer) Match(p Peekable) bool {
 }
 
 // Lex lexes all characters inside double quotes. It works with multiple line
-// string, but NOT if any " are escaped	inside the string.
-//
-// TODO: implement escaping " inside double quotes, ie "Hello \" World"
-func (s *StringLexer) Lex(r Readable) []rune {
+// string and escaped \" and escaped characters inside string.
+func (s *StringLexer) Lex(r Readable) (results []rune) {
 	r.ReadRunes(1) // throwaway " at beginning of line
 
-	chars := r.ReadTill(
-		func(char rune) bool { return char != '"' },
-	)
+	for {
+		chars, _ := r.ReadRunes(1)
+		if chars[0] == '"' { // end of string
+			return results
+		}
+
+		results = append(results, chars[0])
+
+		// if escape character, read next char blindly and add to results
+		if chars[0] == '\\' {
+			chars, _ = r.ReadRunes(1)
+			results = append(results, chars[0])
+		}
+	}
 
 	r.ReadRunes(1) // throwaway " at end of line
 
-	return chars
+	return results
 }
 
 type IdentifierLexer struct{}
