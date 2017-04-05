@@ -93,12 +93,14 @@ func (s *StringLexer) Match(p Peekable) bool {
 
 // Lex lexes all characters inside double quotes. It works with multiple line
 // string and escaped \" and escaped characters inside string.
+//
+// TODO: raise error on unterminated strings.
 func (s *StringLexer) Lex(r Readable) (results []rune) {
 	r.ReadRunes(1) // throwaway " at beginning of line
 
 	for {
-		chars, _ := r.ReadRunes(1)
-		if chars[0] == '"' { // end of string
+		chars, err := r.ReadRunes(1)
+		if err != nil || chars[0] == '"' { // end of string
 			return results
 		}
 
@@ -106,7 +108,9 @@ func (s *StringLexer) Lex(r Readable) (results []rune) {
 
 		// if escape character, read next char blindly and add to results
 		if chars[0] == '\\' {
-			chars, _ = r.ReadRunes(1)
+			if chars, err = r.ReadRunes(1); err != nil {
+				return results
+			}
 			results = append(results, chars[0])
 		}
 	}

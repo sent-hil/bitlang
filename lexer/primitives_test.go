@@ -127,6 +127,10 @@ func TestStringLexer(t *testing.T) {
 				So(string(l.Lex(newRuneReader(`"He\\\"llo"`))), ShouldEqual, `He\\\"llo`)
 			})
 
+			Convey("It returns till end of file for unterminated strings", func() {
+				So(string(l.Lex(newRuneReader(`"Hello`))), ShouldEqual, "Hello")
+			})
+
 			Convey("It discards quotes at end of the string", func() {
 				r := newRuneReader(`"Hello"`)
 				So(string(l.Lex(r)), ShouldEqual, "Hello")
