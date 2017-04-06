@@ -126,6 +126,13 @@ func (r *Reader) Reset(bufReader RuneReader) {
 	r.RuneReader = bufReader
 }
 
+// IsAtEnd returns if at the end of string, ie reading 1 more character
+// would return `io.EOF` error.
+func (r *Reader) IsAtEnd() bool {
+	_, err := r.PeekSingleRune()
+	return err == io.EOF
+}
+
 // readFromReader gets given x number of runes from underlying reader and stores
 // it to make sure local buffer has n runes.
 //

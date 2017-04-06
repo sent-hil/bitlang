@@ -200,5 +200,15 @@ func TestRuneIo(t *testing.T) {
 				So(string(runes), ShouldEqual, "New")
 			})
 		})
+
+		Convey("IsAtEnd", func() {
+			Convey("It returns if there are more chars left to read", func() {
+				So(om.IsAtEnd(), ShouldEqual, false)
+			})
+
+			Convey("It returns if no more chars left to be read", func() {
+				So(em.IsAtEnd(), ShouldEqual, true)
+			})
+		})
 	})
 }
