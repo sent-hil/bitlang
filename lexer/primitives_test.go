@@ -61,7 +61,7 @@ func TestCommentLexer(t *testing.T) {
 
 func TestNumberLexer(t *testing.T) {
 	Convey("NumberLexer", t, func() {
-		l := NewIntegerLexer()
+		l := NewNumberLexer()
 
 		Convey("Match", func() {
 			Convey("It matches if char is a number", func() {
@@ -86,7 +86,7 @@ func TestNumberLexer(t *testing.T) {
 				So(string(l.Lex(newRuneReader("1234.5"))), ShouldEqual, "1234.5")
 			})
 
-			Convey("IT does not lex anything after 1st dot", func() {
+			Convey("It does not lex anything after 1st dot", func() {
 				So(string(l.Lex(newRuneReader("1234.5.6"))), ShouldEqual, "1234.5")
 			})
 

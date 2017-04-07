@@ -5,11 +5,9 @@ import (
 	"unicode"
 )
 
-var WhiteSpaceChars = []string{"\t", "\n", "\r", " "}
-
 type CommentLexer struct{}
 
-func NewCommentLexer() *CommentLexer {
+func NewCommentLexer() Lexable {
 	return &CommentLexer{}
 }
 
@@ -46,7 +44,7 @@ func (c *CommentLexer) Lex(r Readable) (results []rune) {
 
 type NumberLexer struct{}
 
-func NewIntegerLexer() *NumberLexer {
+func NewNumberLexer() Lexable {
 	return &NumberLexer{}
 }
 
@@ -86,7 +84,7 @@ func (i *NumberLexer) Lex(r Readable) []rune {
 
 type StringLexer struct{}
 
-func NewStringLexer() *StringLexer {
+func NewStringLexer() Lexable {
 	return &StringLexer{}
 }
 
@@ -131,7 +129,7 @@ func (s *StringLexer) Lex(r Readable) (results []rune) {
 
 type IdentifierLexer struct{}
 
-func NewIdentifierLexer() *IdentifierLexer {
+func NewIdentifierLexer() Lexable {
 	return &IdentifierLexer{}
 }
 
@@ -156,7 +154,7 @@ func (i *IdentifierLexer) Lex(r Readable) []rune {
 
 type EOFLexer struct{}
 
-func NewEOFLexer() *EOFLexer {
+func NewEOFLexer() Lexable {
 	return &EOFLexer{}
 }
 
@@ -171,9 +169,11 @@ func (e *EOFLexer) Lex(r Readable) []rune {
 	return nil
 }
 
+var WhiteSpaceChars = []string{"\t", "\n", "\r", " "}
+
 type WhiteSpaceLexer struct{}
 
-func NewWhiteSpaceLexer() *WhiteSpaceLexer {
+func NewWhiteSpaceLexer() Lexable {
 	return &WhiteSpaceLexer{}
 }
 

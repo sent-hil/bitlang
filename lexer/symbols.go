@@ -26,7 +26,7 @@ var SymbolsNested = map[string]string{
 
 type SymbolLexer struct{}
 
-func NewSymbolLexer() *SymbolLexer {
+func NewSymbolLexer() Lexable {
 	return &SymbolLexer{}
 }
 
@@ -41,13 +41,9 @@ func (s *SymbolLexer) Match(p Peekable) bool {
 }
 
 func (s *SymbolLexer) Lex(r Readable) (result []rune) {
-	chars, err := r.PeekRunes(2)
+	chars, err := r.PeekRunes(1)
 	if err != nil {
 		return nil
-	}
-
-	if _, ok := SymbolsNested[string(chars)]; ok {
-		result, err = r.ReadRunes(2)
 	}
 
 	if _, ok := SymbolsMap[string(chars[0])]; ok {
