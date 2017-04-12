@@ -32,7 +32,7 @@ func NewSymbolLexer() Lexable {
 	return &SymbolLexer{}
 }
 
-func (s *SymbolLexer) Match(p Peekable) bool {
+func (s *SymbolLexer) Match(p Readable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
 		return false

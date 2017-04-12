@@ -12,7 +12,7 @@ func NewCommentLexer() Lexable {
 }
 
 // Match matches if 1st and 2nd characters are /, ie //.
-func (c *CommentLexer) Match(p Peekable) bool {
+func (c *CommentLexer) Match(p Readable) bool {
 	chars, err := p.PeekRunes(2)
 	if err != nil {
 		return false
@@ -49,7 +49,7 @@ func NewNumberLexer() Lexable {
 }
 
 // Match matches if first character is a number.
-func (i *NumberLexer) Match(p Peekable) bool {
+func (i *NumberLexer) Match(p Readable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
 		return false
@@ -89,7 +89,7 @@ func NewStringLexer() Lexable {
 }
 
 // Match matches if first character is double quotes.
-func (s *StringLexer) Match(p Peekable) bool {
+func (s *StringLexer) Match(p Readable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
 		return false
@@ -134,7 +134,7 @@ func NewIdentifierLexer() Lexable {
 }
 
 // Match matches if first character is a number.
-func (i *IdentifierLexer) Match(p Peekable) bool {
+func (i *IdentifierLexer) Match(p Readable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
 		return false
@@ -159,7 +159,7 @@ func NewEOFLexer() Lexable {
 }
 
 // Match matches if at end of input.
-func (e *EOFLexer) Match(p Peekable) bool {
+func (e *EOFLexer) Match(p Readable) bool {
 	_, err := p.PeekSingleRune()
 	return err == io.EOF
 }
@@ -177,7 +177,7 @@ func NewWhiteSpaceLexer() Lexable {
 	return &WhiteSpaceLexer{}
 }
 
-func (w *WhiteSpaceLexer) Match(p Peekable) bool {
+func (w *WhiteSpaceLexer) Match(p Readable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
 		return false

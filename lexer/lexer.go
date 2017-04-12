@@ -2,19 +2,15 @@ package lexer
 
 import "github.com/sent-hil/bitlang/runeio"
 
-type Peekable interface {
+type Readable interface {
 	PeekRunes(uint) ([]rune, error)
 	PeekSingleRune() (rune, error)
-}
-
-type Readable interface {
-	Peekable
 	ReadRunes(uint) ([]rune, error)
 	ReadTill(func(rune) bool) []rune
 }
 
 type Lexable interface {
-	Match(p Peekable) bool
+	Match(p Readable) bool
 	Lex(r Readable) []rune
 }
 
