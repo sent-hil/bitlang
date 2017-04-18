@@ -1,5 +1,7 @@
 package token
 
+import "fmt"
+
 type TokenID int
 
 const (
@@ -7,7 +9,16 @@ const (
 	TokenEOF
 	TokenInteger
 	TokenComment
+	TokenNewLine
 )
+
+var IDtoString = map[TokenID]string{
+	TokenERR:     "Error",
+	TokenEOF:     "EOF",
+	TokenInteger: "Integer",
+	TokenComment: "Comment",
+	TokenNewLine: "NewLine",
+}
 
 type Token struct {
 	ID    TokenID
@@ -16,4 +27,8 @@ type Token struct {
 
 func NewToken(id TokenID, value string) *Token {
 	return &Token{ID: id, Value: value}
+}
+
+func (t *Token) String() string {
+	return fmt.Sprintf("%s %s", IDtoString[t.ID], t.Value)
 }
