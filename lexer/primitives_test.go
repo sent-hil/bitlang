@@ -38,22 +38,28 @@ func TestCommentLexer(t *testing.T) {
 		Convey("Lex", func() {
 			Convey("It returns comments from '//' till end of line", func() {
 				commentRunes := l.Lex(newRuneReader("//Hello World"))
-				So(string(commentRunes), ShouldEqual, "Hello World")
+				So(commentRunes[0].Value, ShouldEqual, "Hello World")
 			})
 
 			Convey("It returns comments inside comments", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello // World"))
-				So(string(commentRunes), ShouldEqual, " Hello // World")
+				So(commentRunes[0].Value, ShouldEqual, " Hello // World")
 			})
 
 			Convey("It returns multi line comments with newlines", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello\n// World\n"))
-				So(string(commentRunes), ShouldEqual, " Hello\n World\n")
+				So(commentRunes[0].Value, ShouldEqual, " Hello")
+				So(commentRunes[1].Value, ShouldEqual, "\n")
+				So(commentRunes[2].Value, ShouldEqual, " World")
+				So(commentRunes[3].Value, ShouldEqual, "\n")
 			})
 
 			Convey("It does not lex anything after new line", func() {
 				commentRunes := l.Lex(newRuneReader("// Hello World\n//"))
-				So(string(commentRunes), ShouldEqual, " Hello World\n")
+				So(len(commentRunes), ShouldEqual, 3)
+				So(commentRunes[0].Value, ShouldEqual, " Hello World")
+				So(commentRunes[1].Value, ShouldEqual, "\n")
+				So(commentRunes[2].Value, ShouldEqual, "")
 			})
 		})
 	})
@@ -79,19 +85,23 @@ func TestNumberLexer(t *testing.T) {
 
 		Convey("Lex", func() {
 			Convey("It returns till end of integer", func() {
-				So(string(l.Lex(newRuneReader("1234"))), ShouldEqual, "1234")
+				So(l.Lex(newRuneReader("1234"))[0].Value, ShouldEqual, "1234")
 			})
 
 			Convey("It returns till end of float", func() {
-				So(string(l.Lex(newRuneReader("1234.5"))), ShouldEqual, "1234.5")
+				So(l.Lex(newRuneReader("1234.5"))[0].Value, ShouldEqual, "1234.5")
 			})
 
 			Convey("It does not lex anything after 1st dot", func() {
-				So(string(l.Lex(newRuneReader("1234.5.6"))), ShouldEqual, "1234.5")
+				lexmes := l.Lex(newRuneReader("1234.5.6"))
+				So(lexmes[0].Value, ShouldEqual, "1234.5")
+				So(len(lexmes), ShouldEqual, 1)
 			})
 
 			Convey("It does not lex anything after number", func() {
-				So(string(l.Lex(newRuneReader("1234 Hello"))), ShouldEqual, "1234")
+				lexmes := l.Lex(newRuneReader("1234 Hello"))
+				So(lexmes[0].Value, ShouldEqual, "1234")
+				So(len(lexmes), ShouldEqual, 1)
 			})
 		})
 	})
@@ -121,24 +131,25 @@ func TestStringLexer(t *testing.T) {
 
 		Convey("Lex", func() {
 			Convey("It returns chars inside double quotes", func() {
-				So(string(l.Lex(newRuneReader(`"Hello"`))), ShouldEqual, "Hello")
+				So(l.Lex(newRuneReader(`"Hello"`))[0].Value, ShouldEqual, "Hello")
 			})
 
 			Convey("It returns escaped double quote inside double quotes", func() {
-				So(string(l.Lex(newRuneReader(`"He\"llo"`))), ShouldEqual, `He\"llo`)
+				So(l.Lex(newRuneReader(`"He\"llo"`))[0].Value, ShouldEqual, `He\"llo`)
 			})
 
 			Convey("It returns escaped slashes and double quotes inside double quotes", func() {
-				So(string(l.Lex(newRuneReader(`"He\\\"llo"`))), ShouldEqual, `He\\\"llo`)
+				//So(string(l.Lex(newRuneReader(`"He\\\"llo"`))), ShouldEqual, `He\\\"llo`)
+				So(l.Lex(newRuneReader(`"He\\\"llo"`))[0].Value, ShouldEqual, `He\\\"llo`)
 			})
 
 			Convey("It returns till end of file for unterminated strings", func() {
-				So(string(l.Lex(newRuneReader(`"Hello`))), ShouldEqual, "Hello")
+				So(l.Lex(newRuneReader(`"Hello`))[0].Value, ShouldEqual, "Hello")
 			})
 
 			Convey("It discards quotes at end of the string", func() {
 				r := newRuneReader(`"Hello"`)
-				So(string(l.Lex(r)), ShouldEqual, "Hello")
+				So(l.Lex(r)[0].Value, ShouldEqual, "Hello")
 
 				remaining, err := r.String()
 				So(err, ShouldBeNil)
@@ -160,31 +171,31 @@ func TestIdentifierLexer(t *testing.T) {
 
 		Convey("Lex", func() {
 			Convey("It returns chars till end of string", func() {
-				So(string(l.Lex(newRuneReader("hello"))), ShouldEqual, "hello")
+				So(l.Lex(newRuneReader("hello"))[0].Value, ShouldEqual, "hello")
 			})
 
 			Convey("It returns chars till space", func() {
-				So(string(l.Lex(newRuneReader("hello world"))), ShouldEqual, "hello")
+				So(l.Lex(newRuneReader("hello world"))[0].Value, ShouldEqual, "hello")
 			})
 
 			Convey("It returns chars till new tab", func() {
-				So(string(l.Lex(newRuneReader("hello\tworld"))), ShouldEqual, "hello")
+				So(l.Lex(newRuneReader("hello\tworld"))[0].Value, ShouldEqual, "hello")
 			})
 
 			Convey("It returns chars till end of line", func() {
-				So(string(l.Lex(newRuneReader("hello\nworld"))), ShouldEqual, "hello")
+				So(l.Lex(newRuneReader("hello\nworld"))[0].Value, ShouldEqual, "hello")
 			})
 
 			Convey("It returns chars till carriage return", func() {
-				So(string(l.Lex(newRuneReader("hello\rworld"))), ShouldEqual, "hello")
+				So(l.Lex(newRuneReader("hello\rworld"))[0].Value, ShouldEqual, "hello")
 			})
 
 			Convey("It returns chars till //", func() {
-				So(string(l.Lex(newRuneReader("hello//"))), ShouldEqual, "hello")
+				So(l.Lex(newRuneReader("hello//"))[0].Value, ShouldEqual, "hello")
 			})
 
 			Convey("It returns chars with numbers", func() {
-				So(string(l.Lex(newRuneReader("hello1"))), ShouldEqual, "hello1")
+				So(l.Lex(newRuneReader("hello1"))[0].Value, ShouldEqual, "hello1")
 			})
 		})
 	})
@@ -202,7 +213,7 @@ func TestEOFLexer(t *testing.T) {
 
 		Convey("Lex", func() {
 			Convey("It returns chars till end of string", func() {
-				So(len(l.Lex(newRuneReader(""))), ShouldEqual, 0)
+				So(l.Lex(newRuneReader(""))[0].Value, ShouldEqual, "")
 			})
 		})
 	})
@@ -224,7 +235,7 @@ func TestWhiteSpaceLexer(t *testing.T) {
 			Convey("It returns chars till end of string", func() {
 				for _, char := range WhiteSpaceChars {
 					charWithExtra := fmt.Sprintf("%shello", char)
-					So(string(l.Lex(newRuneReader(charWithExtra))), ShouldEqual, char)
+					So(l.Lex(newRuneReader(charWithExtra))[0].Value, ShouldEqual, char)
 				}
 			})
 		})

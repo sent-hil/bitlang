@@ -3,6 +3,8 @@ package lexer
 import (
 	"io"
 	"unicode"
+
+	"github.com/sent-hil/bitlang/token"
 )
 
 type CommentLexer struct{}
@@ -22,21 +24,24 @@ func (c *CommentLexer) Match(p Readable) bool {
 }
 
 // Lex lexes from after '//' to end of line. It supports multi line comments.
-func (c *CommentLexer) Lex(r Readable) (results []rune) {
+func (c *CommentLexer) Lex(r Readable) (results []*token.Token) {
 	for c.Match(r) {
 		r.ReadRunes(2) // throwaway '//' at beginning of line
 
-		results = append(results, r.ReadTill(
+		singleLineChars := r.ReadTill(
 			func(char rune) bool { return char != '\n' },
-		)...)
+		)
+
+		results = append(results, token.NewToken(token.COMMENT, string(singleLineChars)))
 
 		// read '\n' and add to results
-		chars, err := r.ReadRunes(1)
+		singleLineChars, err := r.ReadRunes(1)
 		if err != nil {
 			return results
 		}
 
-		results = append(results, chars[0])
+		results = append(results,
+			token.NewToken(token.WHITESPACE, string(singleLineChars)))
 	}
 
 	return results
@@ -59,10 +64,10 @@ func (i *NumberLexer) Match(p Readable) bool {
 }
 
 // Lex lexes integers and floats.
-func (i *NumberLexer) Lex(r Readable) []rune {
+func (i *NumberLexer) Lex(r Readable) (results []*token.Token) {
 	hasDot := false
 
-	return r.ReadTill(
+	accum := r.ReadTill(
 		func(char rune) bool {
 			if unicode.IsNumber(char) {
 				return true
@@ -80,6 +85,12 @@ func (i *NumberLexer) Lex(r Readable) []rune {
 			return false
 		},
 	)
+
+	var tokenId = token.NUMBER
+
+	results = append(results, token.NewToken(tokenId, string(accum)))
+
+	return results
 }
 
 type StringLexer struct{}
@@ -102,29 +113,30 @@ func (s *StringLexer) Match(p Readable) bool {
 // string and escaped \" and escaped characters inside string.
 //
 // TODO: raise error on unterminated strings.
-func (s *StringLexer) Lex(r Readable) (results []rune) {
+func (s *StringLexer) Lex(r Readable) (results []*token.Token) {
 	r.ReadRunes(1) // throwaway " at beginning of line
 
+	var accum string
 	for {
 		chars, err := r.ReadRunes(1)
 		if err != nil || chars[0] == '"' { // end of string
-			return results
+			return []*token.Token{token.NewToken(token.STRING, accum)}
 		}
 
-		results = append(results, chars[0])
+		accum += string(chars[0])
 
 		// if escape character, read next char blindly and add to results
 		if chars[0] == '\\' {
 			if chars, err = r.ReadRunes(1); err != nil {
-				return results
+				return []*token.Token{token.NewToken(token.STRING, accum)}
 			}
-			results = append(results, chars[0])
+			accum += string(chars[0])
 		}
 	}
 
 	r.ReadRunes(1) // throwaway " at end of line
 
-	return results
+	return []*token.Token{token.NewToken(token.STRING, accum)}
 }
 
 type IdentifierLexer struct{}
@@ -144,12 +156,19 @@ func (i *IdentifierLexer) Match(p Readable) bool {
 }
 
 // Lex lexes from start till space, tab, end of line or carriage return.
-func (i *IdentifierLexer) Lex(r Readable) []rune {
-	return r.ReadTill(
+func (i *IdentifierLexer) Lex(r Readable) []*token.Token {
+	accum := r.ReadTill(
 		func(char rune) bool {
 			return unicode.IsLetter(char) || unicode.IsNumber(char)
 		},
 	)
+
+	tId, ok := token.IdentifiersList[string(accum)]
+	if ok {
+		return []*token.Token{token.NewToken(tId, string(accum))}
+	}
+
+	return []*token.Token{token.NewToken(token.IDENTIFIER, string(accum))}
 }
 
 type EOFLexer struct{}
@@ -165,8 +184,8 @@ func (e *EOFLexer) Match(p Readable) bool {
 }
 
 // Lex returns nil to indicate there's nothing more to lex.
-func (e *EOFLexer) Lex(r Readable) []rune {
-	return nil
+func (e *EOFLexer) Lex(r Readable) []*token.Token {
+	return []*token.Token{token.NewToken(token.EOF, "")}
 }
 
 var WhiteSpaceChars = []string{"\t", "\n", "\r", " "}
@@ -192,11 +211,11 @@ func (w *WhiteSpaceLexer) Match(p Readable) bool {
 	return false
 }
 
-func (w *WhiteSpaceLexer) Lex(r Readable) []rune {
-	chars, err := r.ReadRunes(1)
+func (w *WhiteSpaceLexer) Lex(r Readable) []*token.Token {
+	accum, err := r.ReadRunes(1)
 	if err != nil {
 		return nil
 	}
 
-	return chars
+	return []*token.Token{token.NewToken(token.WHITESPACE, string(accum))}
 }

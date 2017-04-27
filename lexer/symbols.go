@@ -1,29 +1,33 @@
 package lexer
 
-import "io"
+import (
+	"io"
 
-var SymbolsMap = map[string]string{
-	"(": "(",
-	")": ")",
-	"{": "{",
-	"}": "}",
-	",": ",",
-	".": ".",
-	"-": "-",
-	"+": "+",
-	";": ";",
-	"/": "/",
-	"!": "!",
-	"=": "=",
-	"<": "<",
-	">": ">",
+	"github.com/sent-hil/bitlang/token"
+)
+
+var SymbolsMap = map[string]token.TokenID{
+	"(": token.LEFT_PAREN,
+	")": token.RIGHT_PAREN,
+	"{": token.LEFT_BRACE,
+	"}": token.RIGHT_BRACE,
+	",": token.COMMA,
+	".": token.DOT,
+	"-": token.MINUS,
+	"+": token.PLUS,
+	";": token.SEMICOLON,
+	"/": token.SLASH,
+	"!": token.BANG,
+	"=": token.EQUAL,
+	"<": token.LESS,
+	">": token.GREATER,
 }
 
-var SymbolsNested = map[string]string{
-	"!=": "!=",
-	"==": "==",
-	"<=": "<",
-	">=": ">=",
+var SymbolsNested = map[string]token.TokenID{
+	"!=": token.BANG_EQUAL,
+	"==": token.EQUAL_EQUAL,
+	"<=": token.LESS_EQUAL,
+	">=": token.GREATER_EQUAL,
 }
 
 type SymbolLexer struct{}
@@ -42,7 +46,7 @@ func (s *SymbolLexer) Match(p Readable) bool {
 	return exists
 }
 
-func (s *SymbolLexer) Lex(r Readable) (result []rune) {
+func (s *SymbolLexer) Lex(r Readable) (accum []*token.Token) {
 	chars, err := r.PeekRunes(2)
 	if err != nil && err != io.EOF {
 		return nil
@@ -51,27 +55,28 @@ func (s *SymbolLexer) Lex(r Readable) (result []rune) {
 		return s.LexSingle(r)
 	}
 
-	if _, ok := SymbolsNested[string(chars)]; ok {
-		if result, err = r.ReadRunes(2); err != nil {
+	if tId, ok := SymbolsNested[string(chars)]; ok {
+		if chars, err = r.ReadRunes(2); err != nil {
 			return nil
 		}
-		return result
+		return []*token.Token{token.NewToken(tId, string(chars))}
 	}
 
 	return s.LexSingle(r)
 }
 
-func (s *SymbolLexer) LexSingle(r Readable) (result []rune) {
+func (s *SymbolLexer) LexSingle(r Readable) (accum []*token.Token) {
 	char, err := r.PeekRunes(1)
 	if err != nil {
 		return nil
 	}
 
-	if _, ok := SymbolsMap[string(char)]; ok {
-		if result, err = r.ReadRunes(1); err != nil {
+	tId, ok := SymbolsMap[string(char)]
+	if ok {
+		if _, err := r.ReadRunes(1); err != nil {
 			return nil
 		}
 	}
 
-	return result
+	return []*token.Token{token.NewToken(tId, string(char))}
 }

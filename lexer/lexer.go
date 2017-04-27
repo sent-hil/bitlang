@@ -1,6 +1,9 @@
 package lexer
 
-import "github.com/sent-hil/bitlang/runeio"
+import (
+	"github.com/sent-hil/bitlang/runeio"
+	"github.com/sent-hil/bitlang/token"
+)
 
 type Readable interface {
 	PeekRunes(uint) ([]rune, error)
@@ -11,7 +14,7 @@ type Readable interface {
 
 type Lexable interface {
 	Match(p Readable) bool
-	Lex(r Readable) []rune
+	Lex(r Readable) []*token.Token
 }
 
 type LexableConstructor func() Lexable
@@ -36,12 +39,12 @@ func NewAnyLexer(reader *runeio.Reader) *AnyLexer {
 	}
 }
 
-func (a *AnyLexer) LexAll() (results [][]rune, err error) {
+func (a *AnyLexer) LexAll() (results []*token.Token, err error) {
 	for !a.reader.IsAtEnd() {
 		for _, initializer := range a.lexers {
 			lexer := initializer()
 			if lexer.Match(a.reader) {
-				results = append(results, lexer.Lex(a.reader))
+				results = append(results, lexer.Lex(a.reader)...)
 				break
 			}
 		}

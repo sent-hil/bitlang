@@ -25,10 +25,10 @@ func TestSymbolLexer(t *testing.T) {
 					var char string
 
 					char = fmt.Sprintf("%s", key)
-					So(string(s.Lex(newRuneReader(char))), ShouldEqual, key)
+					So(s.Lex(newRuneReader(char))[0].Value, ShouldEqual, key)
 
 					char = fmt.Sprintf("%s hello", key)
-					So(string(s.Lex(newRuneReader(char))), ShouldEqual, key)
+					So(s.Lex(newRuneReader(char))[0].Value, ShouldEqual, key)
 				}
 			})
 
@@ -37,17 +37,17 @@ func TestSymbolLexer(t *testing.T) {
 					var char string
 
 					char = fmt.Sprintf("%s", key)
-					So(string(s.Lex(newRuneReader(char))), ShouldEqual, key)
+					So(s.Lex(newRuneReader(char))[0].Value, ShouldEqual, key)
 
 					char = fmt.Sprintf("%s hello", key)
-					So(string(s.Lex(newRuneReader(char))), ShouldEqual, key)
+					So(s.Lex(newRuneReader(char))[0].Value, ShouldEqual, key)
 				}
 			})
 
 			Convey("It lexes double symbols chars first", func() {
-				So(string(s.Lex(newRuneReader("!="))), ShouldEqual, "!=")
-				So(string(s.Lex(newRuneReader("!=="))), ShouldEqual, "!=")
-				So(string(s.Lex(newRuneReader("="))), ShouldEqual, "=")
+				So(s.Lex(newRuneReader("!="))[0].Value, ShouldEqual, "!=")
+				So(s.Lex(newRuneReader("!=="))[0].Value, ShouldEqual, "!=")
+				So(s.Lex(newRuneReader("="))[0].Value, ShouldEqual, "=")
 			})
 		})
 	})
