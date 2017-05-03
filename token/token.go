@@ -25,21 +25,21 @@ const (
 	LESS
 	LESS_EQUAL
 	IDENTIFIER
-	STRING
-	NUMBER
 	AND
+	IF
 	ELSE
+	TRUE
 	FALSE
 	FOR
-	IF
-	NIL
 	OR
 	RETURN
-	TRUE
 	VAR
 	EOF
 	COMMENT
 	WHITESPACE
+	STRING
+	NUMBER
+	NIL
 )
 
 var TokenIDString = map[TokenID]string{
@@ -63,33 +63,33 @@ var TokenIDString = map[TokenID]string{
 	LESS:          "LESS",
 	LESS_EQUAL:    "LESS_EQUAL",
 	IDENTIFIER:    "IDENTIFIER",
-	STRING:        "STRING",
-	NUMBER:        "NUMBER",
 	AND:           "AND",
+	IF:            "IF",
 	ELSE:          "ELSE",
+	TRUE:          "TRUE",
 	FALSE:         "FALSE",
 	FOR:           "FOR",
-	IF:            "IF",
-	NIL:           "NIL",
 	OR:            "OR",
 	RETURN:        "RETURN",
-	TRUE:          "TRUE",
 	VAR:           "VAR",
 	EOF:           "EOF",
 	COMMENT:       "COMMENT",
 	WHITESPACE:    "WHITESPACE",
+	STRING:        "STRING",
+	NUMBER:        "NUMBER",
+	NIL:           "NIL",
 }
 
 var IdentifiersList = map[string]TokenID{
 	"and":    AND,
+	"if":     IF,
 	"else":   ELSE,
+	"true":   TRUE,
 	"false":  FALSE,
 	"for":    FOR,
-	"if":     IF,
 	"nil":    NIL,
 	"or":     OR,
 	"return": RETURN,
-	"true":   TRUE,
 	"var":    VAR,
 }
 
