@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/sent-hil/bitlang/runeio"
+	"github.com/sent-hil/bitlang/token"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -85,11 +86,15 @@ func TestNumberLexer(t *testing.T) {
 
 		Convey("Lex", func() {
 			Convey("It returns till end of integer", func() {
-				So(l.Lex(newRuneReader("1234"))[0].Value, ShouldEqual, "1234")
+				lexed := l.Lex(newRuneReader("1234"))
+				So(lexed[0].Value, ShouldEqual, "1234")
+				So(lexed[0].ID, ShouldEqual, token.INTEGER)
 			})
 
 			Convey("It returns till end of float", func() {
-				So(l.Lex(newRuneReader("1234.5"))[0].Value, ShouldEqual, "1234.5")
+				lexed := l.Lex(newRuneReader("1234.5"))
+				So(lexed[0].Value, ShouldEqual, "1234.5")
+				So(lexed[0].ID, ShouldEqual, token.FLOAT)
 			})
 
 			Convey("It does not lex anything after 1st dot", func() {

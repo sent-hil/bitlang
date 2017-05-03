@@ -25,7 +25,7 @@ func TestAnyLexer(t *testing.T) {
 		So(results[1].ID, ShouldEqual, token.WHITESPACE)
 
 		So(results[2].Value, ShouldEqual, "1.23")
-		So(results[2].ID, ShouldEqual, token.NUMBER)
+		So(results[2].ID, ShouldEqual, token.FLOAT)
 
 		So(results[3].Value, ShouldEqual, "\n")
 		So(results[3].ID, ShouldEqual, token.WHITESPACE)

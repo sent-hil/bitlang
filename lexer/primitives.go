@@ -66,6 +66,7 @@ func (i *NumberLexer) Match(p Readable) bool {
 // Lex lexes integers and floats.
 func (i *NumberLexer) Lex(r Readable) (results []*token.Token) {
 	hasDot := false
+	tokenId := token.INTEGER
 
 	accum := r.ReadTill(
 		func(char rune) bool {
@@ -77,6 +78,7 @@ func (i *NumberLexer) Lex(r Readable) (results []*token.Token) {
 				if hasDot {
 					return false // already has a dot, so this is a method call
 				} else {
+					tokenId = token.FLOAT
 					hasDot = true
 					return true
 				}
@@ -85,8 +87,6 @@ func (i *NumberLexer) Lex(r Readable) (results []*token.Token) {
 			return false
 		},
 	)
-
-	var tokenId = token.NUMBER
 
 	results = append(results, token.NewToken(tokenId, string(accum)))
 
