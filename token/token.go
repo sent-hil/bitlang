@@ -37,7 +37,6 @@ const (
 	COMMENT
 	WHITESPACE
 	STRING
-	NUMBER
 	NIL
 	FLOAT
 	INTEGER
@@ -77,7 +76,6 @@ var TokenIDString = map[TokenID]string{
 	COMMENT:       "COMMENT",
 	WHITESPACE:    "WHITESPACE",
 	STRING:        "STRING",
-	NUMBER:        "NUMBER",
 	NIL:           "NIL",
 	FLOAT:         "FLOAT",
 	INTEGER:       "INTEGER",
