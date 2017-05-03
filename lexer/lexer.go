@@ -1,6 +1,8 @@
 package lexer
 
 import (
+	"fmt"
+
 	"github.com/sent-hil/bitlang/runeio"
 	"github.com/sent-hil/bitlang/token"
 )
@@ -41,11 +43,19 @@ func NewAnyLexer(reader *runeio.Reader) *AnyLexer {
 
 func (a *AnyLexer) LexAll() (results []*token.Token, err error) {
 	for !a.reader.IsAtEnd() {
-		for _, initializer := range a.lexers {
-			lexer := initializer()
-			if lexer.Match(a.reader) {
+		unMatched := true
+		for _, lexerInitializer := range a.lexers {
+			if lexer := lexerInitializer(); lexer.Match(a.reader) {
+				unMatched = false
 				results = append(results, lexer.Lex(a.reader)...)
 				break
+			}
+		}
+
+		if unMatched {
+			char, err := a.reader.PeekSingleRune()
+			if err == nil {
+				return results, fmt.Errorf("Unmatched char: %s", char)
 			}
 		}
 	}
