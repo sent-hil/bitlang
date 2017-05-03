@@ -41,13 +41,13 @@ func NewAnyLexer(reader *runeio.Reader) *AnyLexer {
 	}
 }
 
-func (a *AnyLexer) LexAll() (results []*token.Token, err error) {
+func (a *AnyLexer) LexAll() (tokens []*token.Token, err error) {
 	for !a.reader.IsAtEnd() {
 		unMatched := true
 		for _, lexerInitializer := range a.lexers {
 			if lexer := lexerInitializer(); lexer.Match(a.reader) {
 				unMatched = false
-				results = append(results, lexer.Lex(a.reader)...)
+				tokens = append(tokens, lexer.Lex(a.reader)...)
 				break
 			}
 		}
@@ -55,10 +55,10 @@ func (a *AnyLexer) LexAll() (results []*token.Token, err error) {
 		if unMatched {
 			char, err := a.reader.PeekSingleRune()
 			if err == nil {
-				return results, fmt.Errorf("Unmatched char: %s", char)
+				return tokens, fmt.Errorf("Unmatched char: %s", char)
 			}
 		}
 	}
 
-	return results, err
+	return tokens, err
 }

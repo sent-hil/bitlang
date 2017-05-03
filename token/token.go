@@ -82,7 +82,7 @@ var TokenIDString = map[TokenID]string{
 	EOF:           "EOF",
 }
 
-var IdentifiersList = map[string]TokenID{
+var KeywordsList = map[string]TokenID{
 	"and":    AND,
 	"if":     IF,
 	"else":   ELSE,

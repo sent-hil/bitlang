@@ -23,28 +23,29 @@ func (c *CommentLexer) Match(p Readable) bool {
 	return string(chars) == "//"
 }
 
-// Lex lexes from after '//' to end of line. It supports multi line comments.
-func (c *CommentLexer) Lex(r Readable) (results []*token.Token) {
+// Lex lexes from after // to end of line. It can parse multi line comments,
+// but each line needs to be prefixed with //.
+func (c *CommentLexer) Lex(r Readable) (tokens []*token.Token) {
 	for c.Match(r) {
 		r.ReadRunes(2) // throwaway '//' at beginning of line
 
-		singleLineChars := r.ReadTill(
+		singleLine := r.ReadTill(
 			func(char rune) bool { return char != '\n' },
 		)
 
-		results = append(results, token.NewToken(token.COMMENT, string(singleLineChars)))
+		tokens = append(tokens, token.NewToken(token.COMMENT, string(singleLine)))
 
-		// read '\n' and add to results
-		singleLineChars, err := r.ReadRunes(1)
+		// read '\n' at end of line and add to tokens
+		singleLine, err := r.ReadRunes(1)
 		if err != nil {
-			return results
+			return tokens
 		}
 
-		results = append(results,
-			token.NewToken(token.WHITESPACE, string(singleLineChars)))
+		tokens = append(tokens,
+			token.NewToken(token.WHITESPACE, string(singleLine)))
 	}
 
-	return results
+	return tokens
 }
 
 type NumberLexer struct{}
@@ -53,7 +54,7 @@ func NewNumberLexer() Lexable {
 	return &NumberLexer{}
 }
 
-// Match matches if first character is a number.
+// Match matches if first character is a digit.
 func (i *NumberLexer) Match(p Readable) bool {
 	char, err := p.PeekSingleRune()
 	if err != nil {
@@ -64,7 +65,7 @@ func (i *NumberLexer) Match(p Readable) bool {
 }
 
 // Lex lexes integers and floats.
-func (i *NumberLexer) Lex(r Readable) (results []*token.Token) {
+func (i *NumberLexer) Lex(r Readable) (tokens []*token.Token) {
 	hasDot := false
 	tokenId := token.INTEGER
 
@@ -88,9 +89,9 @@ func (i *NumberLexer) Lex(r Readable) (results []*token.Token) {
 		},
 	)
 
-	results = append(results, token.NewToken(tokenId, string(accum)))
+	tokens = append(tokens, token.NewToken(tokenId, string(accum)))
 
-	return results
+	return tokens
 }
 
 type StringLexer struct{}
@@ -110,10 +111,10 @@ func (s *StringLexer) Match(p Readable) bool {
 }
 
 // Lex lexes all characters inside double quotes. It works with multiple line
-// string and escaped \" and escaped characters inside string.
+// string and also escaped \" and escaped characters inside string.
 //
 // TODO: raise error on unterminated strings.
-func (s *StringLexer) Lex(r Readable) (results []*token.Token) {
+func (s *StringLexer) Lex(r Readable) (tokens []*token.Token) {
 	r.ReadRunes(1) // throwaway " at beginning of line
 
 	var accum string
@@ -125,8 +126,9 @@ func (s *StringLexer) Lex(r Readable) (results []*token.Token) {
 
 		accum += string(chars[0])
 
-		// if escape character, read next char blindly and add to results
-		if chars[0] == '\\' {
+		// if escape character, read next char blindly and add to tokens
+		if string(chars[0]) == `\` {
+			// if err, ie EOF, then return everything seen so far
 			if chars, err = r.ReadRunes(1); err != nil {
 				return []*token.Token{token.NewToken(token.STRING, accum)}
 			}
@@ -163,11 +165,12 @@ func (i *IdentifierLexer) Lex(r Readable) []*token.Token {
 		},
 	)
 
-	tId, ok := token.IdentifiersList[string(accum)]
+	tId, ok := token.KeywordsList[string(accum)]
 	if ok {
 		return []*token.Token{token.NewToken(tId, string(accum))}
 	}
 
+	// if not a reserved keyword, then it's a identifier
 	return []*token.Token{token.NewToken(token.IDENTIFIER, string(accum))}
 }
 
@@ -177,7 +180,7 @@ func NewEOFLexer() Lexable {
 	return &EOFLexer{}
 }
 
-// Match matches if at end of input.
+// Match matches if at end of string.
 func (e *EOFLexer) Match(p Readable) bool {
 	_, err := p.PeekSingleRune()
 	return err == io.EOF
