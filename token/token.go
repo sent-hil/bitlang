@@ -28,21 +28,15 @@ const (
 	STRING
 	NUMBER
 	AND
-	CLASS
 	ELSE
 	FALSE
-	FUN
 	FOR
 	IF
 	NIL
 	OR
-	PRINT
 	RETURN
-	SUPER
-	THIS
 	TRUE
 	VAR
-	WHILE
 	EOF
 	COMMENT
 	WHITESPACE
@@ -72,21 +66,15 @@ var TokenIDString = map[TokenID]string{
 	STRING:        "STRING",
 	NUMBER:        "NUMBER",
 	AND:           "AND",
-	CLASS:         "CLASS",
 	ELSE:          "ELSE",
 	FALSE:         "FALSE",
-	FUN:           "FUN",
 	FOR:           "FOR",
 	IF:            "IF",
 	NIL:           "NIL",
 	OR:            "OR",
-	PRINT:         "PRINT",
 	RETURN:        "RETURN",
-	SUPER:         "SUPER",
-	THIS:          "THIS",
 	TRUE:          "TRUE",
 	VAR:           "VAR",
-	WHILE:         "WHILE",
 	EOF:           "EOF",
 	COMMENT:       "COMMENT",
 	WHITESPACE:    "WHITESPACE",
@@ -94,21 +82,15 @@ var TokenIDString = map[TokenID]string{
 
 var IdentifiersList = map[string]TokenID{
 	"and":    AND,
-	"class":  CLASS,
 	"else":   ELSE,
 	"false":  FALSE,
 	"for":    FOR,
-	"fun":    FUN,
 	"if":     IF,
 	"nil":    NIL,
 	"or":     OR,
-	"print":  PRINT,
 	"return": RETURN,
-	"super":  SUPER,
-	"this":   THIS,
 	"true":   TRUE,
 	"var":    VAR,
-	"while":  WHILE,
 }
 
 type Token struct {
