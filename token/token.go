@@ -34,12 +34,14 @@ const (
 	OR
 	RETURN
 	VAR
-	EOF
 	COMMENT
 	WHITESPACE
 	STRING
 	NUMBER
 	NIL
+	FLOAT
+	INTEGER
+	EOF // THIS NEEDS TO BE LAST ONE IN LIST FOR CHECKS
 )
 
 var TokenIDString = map[TokenID]string{
@@ -72,12 +74,14 @@ var TokenIDString = map[TokenID]string{
 	OR:            "OR",
 	RETURN:        "RETURN",
 	VAR:           "VAR",
-	EOF:           "EOF",
 	COMMENT:       "COMMENT",
 	WHITESPACE:    "WHITESPACE",
 	STRING:        "STRING",
 	NUMBER:        "NUMBER",
 	NIL:           "NIL",
+	FLOAT:         "FLOAT",
+	INTEGER:       "INTEGER",
+	EOF:           "EOF",
 }
 
 var IdentifiersList = map[string]TokenID{
@@ -91,6 +95,16 @@ var IdentifiersList = map[string]TokenID{
 	"or":     OR,
 	"return": RETURN,
 	"var":    VAR,
+}
+
+func init() {
+	// check to make sure all tokens are in TokenIDString list; for this to
+	// properly work EOF needs to be the last token defined in iota above.
+	for i := 0; i <= int(EOF); i++ {
+		if _, ok := TokenIDString[TokenID(i)]; !ok {
+			panic(fmt.Sprintf("Missing token: %v in TokenIDString list", i))
+		}
+	}
 }
 
 type Token struct {
